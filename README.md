@@ -30,9 +30,9 @@ This can be edited as needed; in particular, you may want to change the `profile
 
 ## New procedure for parallel searching
 
-Update the search_coordinates.csv file with the coordinates to be searched. 
+Update `search_coordinates.csv` with the coordinates to be searched. 
 
-Open parallel_search.py. Enter the number of threads to run the search on in the `n_threads` parameter. On linux, use:
+Open `parallel_search.py`. Enter the number of threads to run the search on in `n_threads`. On linux, use:
 ```
  $ lspcu 
 ```
@@ -41,13 +41,13 @@ to check how many threads per core your machine has (e.g., if there are 2 per co
 NOTE: as the algorithm is quite cpu intense, it is recommended to try a few test runs with less threads (monitoring your cpu status) and find
 the best compromise.
 
-Adapt the parallel_search.py filepaths to your machine.
+Adapt the `parallel_search.py` filepaths to your machine.
 
 Run on the command line:
 ```
 python parallel_search.py 
 ```
-Monitor the log_dir directory for output log information. 
+Monitor the `log_dir` directory for output log information. 
 
 NOTE: if any of the log files are empty, the search failed (most likely due to an interuption of the program). Run it again.
 
@@ -55,11 +55,11 @@ Once finished, run:
 ```
  python make_list.py
 ```
-Inspect your candidate_list.csv.
+Inspect your `candidate_list.csv`.
 
-Open parallel_plot_hotspot.py. You can either read in candidate_list.csv or, after
-applying any cuts (such as 5 sigma), read in the new candidate_list file with a 
-modified name (such as candidate_list_5sigma.csv) and keep your old one for reference. 
+Open `parallel_plot_hotspot.py`. You can either read in `candidate_list.csv` or, after
+applying any cuts (such as 5 sigma), read in the new `candidate_list.csv` file with a 
+modified name (such as `candidate_list_5sigma.csv`) and keep your old one for reference. 
 
 Set your number of threads and paths, run:
 ```
