@@ -32,7 +32,11 @@ This can be edited as needed; in particular, you may want to change the `profile
 
 Update the search_coordinates.csv file with the coordinates to be searched. 
 
-Open parallel_search.py. Enter the number of threads to run the search on in the 'n_threads' parameter. On linux, use $ lspcu to check how many threads per core your machine has (e.g., if there are 2 per core then a 7 core computer uses 14 threads). 
+Open parallel_search.py. Enter the number of threads to run the search on in the `n_threads` parameter. On linux, use:
+```
+ $ lspcu 
+```
+to check how many threads per core your machine has (e.g., if there are 2 per core then a 7 core computer uses 14 threads). 
 
 NOTE: as the algorithm is quite cpu intense, it is recommended to try a few test runs with less threads (monitoring your cpu status) and find
 the best compromise.
