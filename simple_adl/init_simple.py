@@ -17,7 +17,7 @@ config = {'survey': {
           'band_1' : 'g',
           'band_2' : 'r',
           'catalog' : {
-                       'profile'   : None,
+                       'profile'   : 'delve_private',
                        'nside'     : 32,
                        'mag_max'   : 23.5,
                        'basis_1'   : 'ra',

@@ -12,21 +12,67 @@ import healpy as hp
 
 import simple_adl.search
 
-#-------------------------------------------------------------------------------
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ~~~~~~~~~~~~~~~~~~~~~ DELVE-MC DWARF SEARCH 2021  ~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+#
 
-def submit_job(cfgfile, cfg, ra, dec, pix):
-    outfile = 'results_nside_{}_{}.txt'.format(cfg['catalog']['nside'], pix)
-    logfile = '{}/results_nside_{}_{}.log'.format(cfg['output']['log_dir'], cfg['catalog']['nside'], pix)
-    batch = 'csub -n {} -o {} '.format(cfg['batch']['max_jobs'], logfile)
-    command = 'python {}/search.py --config {} --ra {:0.2f} --dec {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), cfgfile, ra, dec, outfile)
-    command_queue = batch + command
+"""
+Python parallelisation for general clusters
+The csub package is retired in favour of internal python packages
+namely multiprocessing
 
-    print(command_queue)
-    subprocess.call(command_queue.split(' '), shell=False)
+Joanna Sakowska
+"""
+import pandas as pd
+import multiprocessing
+from multiprocessing import Pool
+
+# Enter number of threads to use 
+
+n_threads = 8
+
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sub-routines ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+#
+# JDS: To do: if local cat search, need to add 'cfg' argument I think
+#
+
+
+def submit_job(ra, dec):
+    
+    # Output
+    outfile = 'results_{:0.2f}_{:0.2f}.csv'.format(ra, dec)
+
+    # Commands
+    command = 'python {}/search.py --ra {:0.2f} --dec {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, outfile)
+    print(command)
+    print('Preparing jobs...')
+    subprocess.call(command.split(' '), shell=False)
+
+
+    # Log
+    # Change log directory here
+    log_dir = '/home/js01093/dwarf/simple_adl/simple_adl/log_dir'
+    log_name = '{}/results_{:0.2f}_{:0.2f}.log'.format(log_dir, ra, dec)
+    log = open(log_name, "w")
+    subprocess.Popen(command.split(' '), stdout=log, shell=False)
+    log.close()
+  
+    # JDS: Fix job number for later
+    #print('({}/{})'.format('fix me', len(list_of_ra_dec)))
 
     return
 
-#-------------------------------------------------------------------------------
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Main search ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+#
+
 
 if __name__ == '__main__':
     import argparse
@@ -35,18 +81,40 @@ if __name__ == '__main__':
                         help='config file [.yaml]')
     args = parser.parse_args()
 
+    # Reading config
     with open(args.config, 'r') as ymlfile:
         cfg = yaml.load(ymlfile, Loader=yaml.SafeLoader)
 
-    infiles = glob.glob('{}/*.fits'.format(cfg['catalog']['dirname']))
-    
-    print('Pixelizing...')
-    pix_nside = [] # Equatorial coordinates, RING ordering scheme
-    for infile in infiles:
-        pix_nside.append(int(infile.split('.fits')[0].split('_')[-1]))
-    
-    for ii in range(0, len(pix_nside)):
-        ra, dec = hp.pixelfunc.pix2ang(cfg['catalog']['nside'], pix_nside[ii], lonlat=True)
-    
-        submit_job(args.config, cfg, ra, dec, pix_nside[ii])
-        print('({}/{})'.format(ii+1, len(pix_nside)))
+    # JDS: To search locally
+    #infiles = glob.glob('{}/*.fits'.format(cfg['catalog']['dirname']))
+
+    # Reading in coordinates
+    search_coordinates = pd.read_csv('{}.csv'.format('search_coordinates'), delimiter=',', header=None)
+
+    ra_search_all, dec_search_all = [], []
+
+    results_dir = '/home/js01093/dwarf/simple_adl/simple_adl/results_dir/'
+
+    ra_search_all.extend(search_coordinates.iloc[:,0])
+    dec_search_all.extend(search_coordinates.iloc[:,1])
+
+    ra_search, dec_search = [], []
+
+    for ra, dec in zip(ra_search_all, dec_search_all):
+        if os.path.exists(os.path.join(results_dir, 'results_{:0.2f}_{:0.2f}.csv'.format(ra, dec))):
+            print('EXISTS results_{:0.2f}_{:0.2f}.csv'.format(ra, dec))
+        else:
+            ra_search.append(ra)
+            dec_search.append(dec)
+
+    # Clean memory
+    ra_search_all, dec_search_all = [], []
+
+    print('Ready to search the Magellanic Clouds!')
+
+    # Zipping arguments for command
+    search_arguments = [*zip(ra_search,dec_search)]
+
+    with Pool(n_threads) as p:
+        p.starmap(submit_job, search_arguments)
+        
