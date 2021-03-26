@@ -4,7 +4,7 @@ An adaptation of the simple binner dwarf galaxy search algorithm for use on gene
 
 This version follows [`simple_adl`](https://github.com/sidneymau/simple_adl) which uses data pulled directly from the Astro Data Lab. Thanks Sidney and Will!
 
-Simple_adl originates from [`simple`](https://github.com/DarkEnergySurvey/simple).
+`simple_adl` originates from [`simple`](https://github.com/DarkEnergySurvey/simple).
 
 ## Installation
 
