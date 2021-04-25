@@ -24,8 +24,10 @@ R_i = 1.5690
 # For SMASH:
 #R_u = 4.329
 #R_g = 3.303
-#R_r = 1.263
-#R_i = 2.285
+#R_r = 2.285
+#R_i = 1.263
+
+#--------------------------------------------------------------------------------
 
 def query(profile, ra, dec, radius=1.0, gmax=23.5, stars=True, galaxies=False):
     """Return data queried from datalab

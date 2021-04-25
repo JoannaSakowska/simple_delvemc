@@ -281,6 +281,8 @@ if __name__ == '__main__':
                          distance_modulus_array[ii],
                          mc_source_id_array[ii]))
     
+    print('Job finished {:0.2f} {:0.2f}'.format(ra, dec))
+
     # Write output
     if (len(sig_peak_array) > 0):
         write_output(survey.output['results_dir'], survey.catalog['nside'], region.pix_center, ra_peak_array, dec_peak_array,

@@ -31,7 +31,7 @@ from multiprocessing import Pool
 
 # Enter number of threads to use 
 
-n_threads = 8
+n_threads = 3
 
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -40,6 +40,14 @@ n_threads = 8
 #
 # JDS: To do: if local cat search, need to add 'cfg' argument I think
 #
+
+# Function to tell us job status
+# Use if desired
+
+#def info(title):
+#    print(title)
+#    print('Parent process:', os.getppid())
+#    print('Process id:', os.getpid())
 
 
 def submit_job(ra, dec):
@@ -50,20 +58,23 @@ def submit_job(ra, dec):
     # Commands
     command = 'python {}/search.py --ra {:0.2f} --dec {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, outfile)
     print(command)
-    print('Preparing jobs...')
-    subprocess.call(command.split(' '), shell=False)
+    
+    #print(info('Preparing job {:0.2f} {:0.2f}'.format(ra, dec)))
 
+    subprocess.run(command.split(' '))
 
     # Log
     # Change log directory here
     log_dir = '/home/js01093/dwarf/simple_adl/simple_adl/log_dir'
     log_name = '{}/results_{:0.2f}_{:0.2f}.log'.format(log_dir, ra, dec)
+
     log = open(log_name, "w")
-    subprocess.Popen(command.split(' '), stdout=log, shell=False)
+
+    subprocess.Popen(command.split(' '), stdout=log, stderr=log, shell=False)
+    
+    #subprocess.Pclose()
+
     log.close()
-  
-    # JDS: Fix job number for later
-    #print('({}/{})'.format('fix me', len(list_of_ra_dec)))
 
     return
 
@@ -117,4 +128,6 @@ if __name__ == '__main__':
 
     with Pool(n_threads) as p:
         p.starmap(submit_job, search_arguments)
+
+        
         
