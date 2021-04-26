@@ -48,11 +48,18 @@ Run on the command line:
 ```
 python parallel_search.py 
 ```
-Monitor the `log_dir` directory for output log information. 
+Or, if on a VPN cluster try
+```
+nohup python parallel_search.py &
+```
+this keeps the process running in the background even if
+the connection breaks. The output is muted, so do
+```
+tail -f nohup.out
+```
+to watch the total output log being written.
 
-NOTE: if any of the log files are empty, the search failed (most likely due to an interuption of the program). Run it again.
-
-It is recommended to re-run any searches that do not have a 'Job done' printed at the end of the log.
+Monitor the `log_dir` directory for output log information per search. 
 
 Once finished, run:
 ```
@@ -71,6 +78,21 @@ python parallel_plot_hotspot.py
 ```
 
 And voila! Happy searching! 
+
+## Output checking
+
+To check which log files are empty (incomplete run), run in the  log directory:
+```
+grep -L "Job done" *
+```
+this prints log files without this checkpoint, suggestive ofan error. 
+
+Check if there is no corresponding .csv file in the results. If there is, delete the .csv and
+run the algorithm again.
+
+NOTE: If there is no 'Job done' in the log, but the above command says that
+there is, please view the log in a different editor. Sometimes the editor
+doesn't load the entire log.
 
 ## Example
 
