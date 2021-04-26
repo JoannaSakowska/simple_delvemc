@@ -39,7 +39,7 @@ Open `parallel_search.py`. Enter the number of threads to run the search on in `
 ```
 to check how many threads per core your machine has (e.g., if there are 2 per core then a 7 core computer uses 14 threads). 
 
-NOTE: as the algorithm is quite cpu intense, it is recommended to try a few test runs with less threads (monitoring your cpu status) and find
+NOTE: as the algorithm is subprocess intense, it is recommended to try a few test runs with less threads and find
 the best compromise.
 
 Adapt the `parallel_search.py` filepaths to your machine.
@@ -52,6 +52,8 @@ Monitor the `log_dir` directory for output log information.
 
 NOTE: if any of the log files are empty, the search failed (most likely due to an interuption of the program). Run it again.
 
+It is recommended to re-run any searches that do not have a 'Job done' printed at the end of the log.
+
 Once finished, run:
 ```
  python make_list.py
@@ -61,6 +63,7 @@ Inspect your `candidate_list.csv`.
 Open `parallel_plot_hotspot.py`. You can either read in `candidate_list.csv` or, after
 applying any cuts (such as 5 sigma), read in the new `candidate_list.csv` file with a 
 modified name (such as `candidate_list_5sigma.csv`) and keep your old one for reference. 
+Change the file name accordingly in the code.
 
 Set your number of threads and paths, run:
 ```
