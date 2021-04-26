@@ -10,6 +10,8 @@ import subprocess
 import yaml
 import healpy as hp
 
+import time
+
 import simple_adl.search
 
 #
@@ -57,23 +59,29 @@ def submit_job(ra, dec):
 
     # Commands
     command = 'python {}/search.py --ra {:0.2f} --dec {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, outfile)
-    print(command)
-    
-    #print(info('Preparing job {:0.2f} {:0.2f}'.format(ra, dec)))
-
-    subprocess.run(command.split(' '))
 
     # Log
     # Change log directory here
     log_dir = '/home/js01093/dwarf/simple_adl/simple_adl/log_dir'
     log_name = '{}/results_{:0.2f}_{:0.2f}.log'.format(log_dir, ra, dec)
 
+    # Main function
+
+    print(command)
+
     log = open(log_name, "w")
 
-    subprocess.Popen(command.split(' '), stdout=log, stderr=log, shell=False)
-    
-    #subprocess.Pclose()
+    search_output = (
+        subprocess.run(
+            command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+        )
+        .stdout.decode("utf-8")
+    )
 
+    print(search_output)
+    
+    log.write(str(search_output))
+    
     log.close()
 
     return
