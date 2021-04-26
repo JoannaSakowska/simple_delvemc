@@ -85,10 +85,10 @@ To check which log files are empty (incomplete run), run in the  log directory:
 ```
 grep -L "Job done" *
 ```
-this prints log files without this checkpoint, suggestive ofan error. 
+this prints log files without this checkpoint, suggestive of an error. 
 
 Check if there is no corresponding .csv file in the results. If there is, delete the .csv and
-run the algorithm again.
+run the algorithm again (tip: without nohup as to monitor the output live).
 
 NOTE: If there is no 'Job done' in the log, but the above command says that
 there is, please view the log in a different editor. Sometimes the editor
