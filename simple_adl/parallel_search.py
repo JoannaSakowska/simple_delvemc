@@ -10,8 +10,6 @@ import subprocess
 import yaml
 import healpy as hp
 
-import time
-
 import simple_adl.search
 
 #

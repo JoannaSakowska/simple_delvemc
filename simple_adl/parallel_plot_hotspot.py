@@ -47,7 +47,7 @@ def submit_plot_job(ra, dec, mod):
     command = 'python {}/plot_hotspot.py --ra {:0.2f} --dec {:0.2f} --mod {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, mod, outfile)
     print(command)
     print('Preparing plotting jobs...')
-    subprocess.call(command.split(' '), shell=False)
+    subprocess.run(command.split(' '), shell=False)
 
 
 
