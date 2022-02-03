@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
 Generic python script.
+Modified by: Joanna Sakowska
 """
 __author__ = "Sidney Mau"
 
@@ -18,12 +19,13 @@ config = {'survey': {
           'band_2' : 'r',
           'catalog' : {
                        'profile'   : 'delve_private',
+                       'data_dir'  : 'data_dir',
                        'nside'     : 32,
                        'mag_max'   : 23.5,
                        'basis_1'   : 'ra',
                        'basis_2'   : 'dec',
                        'mag'       : '{}mag',
-                       'mag_dered' : '{}mag_dered',
+                       'mag_dered' : '{}mag0',
                        'mag_err'   : '{}err'
                       },
           'isochrone': { # We may consider leaving this fixed for simplicity
@@ -42,6 +44,11 @@ config = {'survey': {
          }
 
 def init_dirs(cfg):
+
+    data_dir = os.path.join(os.getcwd(), cfg['catalog']['data_dir'])
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
+
     results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
     if not os.path.exists(results_dir):
         os.mkdir(results_dir)
@@ -53,6 +60,8 @@ def init_dirs(cfg):
     save_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'])
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
+
+
 
 #------------------------------------------------------------------------------
 

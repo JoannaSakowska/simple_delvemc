@@ -5,8 +5,9 @@ batch:
 catalog:
   basis_1: ra
   basis_2: dec
+  data_dir: data_dir
   mag: '{}mag'
-  mag_dered: '{}mag_dered'
+  mag_dered: '{}mag0'
   mag_err: '{}err'
   mag_max: 23.5
   nside: 32

@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """
 Generic python script.
+
+Modified for DELVE-MC by 
+Joanna Sakowska
 """
 __author__ = "Sidney Mau"
 
@@ -15,11 +18,14 @@ from dl import queryClient as qc
 #R_i = 1.571
 
 # Yumi:
+# DES DR1 update
 
-R_u = 3.9631
+#R_u = 3.9631
 R_g = 3.1863
 R_r = 2.1401
 R_i = 1.5690
+R_z = 1.196
+R_y = 1.048 
 
 # For SMASH:
 #R_u = 4.329
@@ -29,7 +35,7 @@ R_i = 1.5690
 
 #--------------------------------------------------------------------------------
 
-def query(profile, ra, dec, radius=1.0, gmax=23.5, stars=True, galaxies=False):
+def query(profile, ra, dec, radius=1.0, gmax=24.2, stars=True, galaxies=True):
     """Return data queried from datalab
     Parameters
     ----------
@@ -51,42 +57,42 @@ def query(profile, ra, dec, radius=1.0, gmax=23.5, stars=True, galaxies=False):
         SELECT ra,
                dec,
                gmag,
-               gmag-{R_g}*ebv AS gmag_dered, -- dereddend magnitude
+#               gmag-{R_g}*ebv AS gmag_dered, -- dereddend magnitude
                gerr,
-               rmag-{R_r}*ebv AS rmag_dered, -- dereddend magnitude
+#               rmag-{R_r}*ebv AS rmag_dered, -- dereddend magnitude
                rmag,
                rerr,
                ebv
         FROM delvemc_y2t2.object 
         WHERE q3c_radial_query(ra,dec,{ra},{dec},{radius})
-              AND chi < 3        -- for star-galaxy separation
-              AND prob > 0.5     -- for star-galaxy separation
-              AND prob < 10      -- for star-galaxy separation
-              AND abs(sharp) < 0.5 -- for star-galaxy separation
-              AND gmag < 90      -- for quality
-              AND rmag < 90      -- for quality
-              AND gmag < {gmax}  -- for quality
+              AND brickuniq = 1 -- NEW SG CUT
+              AND gmag < 23.5      -- NEW SG CUT
+              AND rmag < 23.5      -- NEW SG CUT
+              AND abs(gmag - rmag) < 1  -- NEW SG CUT
+              AND prob < 10 -- NEW SG CUT
+              AND abs(sharp) < 0.8 -- for star-galaxy separation
+              AND chi < 3 -- NEW SG CUT
     '''
 
-
+ 
     sql_galaxies = f'''
         SELECT ra,
                dec,
                gmag,
-               gmag-{R_g}*ebv AS gmag_dered, -- dereddend magnitude
+#               gmag-{R_g}*ebv AS gmag_dered, -- dereddend magnitude
                gerr,
-               rmag-{R_r}*ebv AS rmag_dered, -- dereddend magnitude
+#               rmag-{R_r}*ebv AS rmag_dered, -- dereddend magnitude
                rmag,
                rerr,
                ebv
-        FROM delvemc_y2t2.object 
+        FROM delvemc_y2t2.object
         WHERE q3c_radial_query(ra,dec,{ra},{dec},{radius})
-              AND chi > 3        -- for star-galaxy separation
-              AND prob < 0.5     -- for star-galaxy separation
-              AND abs(sharp) > 0.5 -- for star-galaxy separation
-              AND gmag < 90      -- for quality
-              AND rmag < 90      -- for quality
-              AND gmag < {gmax}  -- for quality
+              AND brickuniq = 1  -- NEW SG CUT
+              AND gmag < 23.5      -- NEW SG CUT
+              AND rmag < 23.5      -- NEW SG CUT
+              AND abs(gmag - rmag) < 1  -- NEW SG CUT
+              AND prob < 10 -- NEW SG CUT
+              AND abs(sharp) >= 0.8 -- NEW SG CUT
     '''
 
 
@@ -105,44 +111,6 @@ def query(profile, ra, dec, radius=1.0, gmax=23.5, stars=True, galaxies=False):
     else:
         return(None)
 
-#def query(profile, ra, dec, radius=1.0, gmax=23.5):
-#    """Return data queried from datalab
-#    Parameters
-#    ----------
-#    profile : Profile for data lab query [str]
-#    ra      : Right Ascension [deg]
-#    dec     : Declination [deg]
-#    radius  : radius around (ra, dec) [deg]
-#
-#    Returns
-#    -------
-#    data : numpy recarray of data
-#    """
-#    qc.set_profile(profile)
-#    sql = f'''
-#    SELECT ra,
-#           dec,
-#           gmag,
-#           gmag-{R_g}*ebv AS gmag_dered, -- dereddend magnitude
-#           gerr,
-#           rmag-{R_r}*ebv AS rmag_dered, -- dereddend magnitude
-#           rmag,
-#           rerr,
-#           ebv
-#    FROM delvemc_y2t2.object 
-#    WHERE q3c_radial_query(ra,dec,{ra},{dec},{radius})
-#          AND chi < 3        -- for star-galaxy separation
-#          AND prob > 0.5     -- for star-galaxy separation
-#          AND prob < 10      -- for star-galaxy separation
-#          AND abs(sharp) < 0.5 -- for star-galaxy separation
-#          AND gmag < 90      -- for quality
-#          AND rmag < 90      -- for quality
-#          AND gmag < {gmax}  -- for quality
-#    '''
-#    #data = qc.query(sql=sql,fmt='structarray',timeout=300)
-#    data = qc.query(sql=sql,fmt='structarray')
-#    return(data)
-
 #-------------------------------------------------------------------------------
 
 if __name__ == "__main__":
@@ -160,4 +128,3 @@ if __name__ == "__main__":
                         help='Maximum g-band magnitude [mag]')
     args = parser.parse_args()
     data = query(args.profile, args.ra, args.dec, args.radius, args.gmax)
-    import pdb;pdb.set_trace()

@@ -2,8 +2,9 @@
 """
 Generic python script.
 """
-__author__ = "Sidney Mau"
+__author__ = "Sidney Mau and Joanna Sakowska"
 
+from select import select
 import sys
 import os
 import glob
@@ -182,7 +183,7 @@ if __name__ == '__main__':
     else:
         parser.error('Please specify either (ra, dec) or (nside, ipix).')
 
-    with open(args.config, 'r') as ymlfile:
+    with open(args.config, 'r') as ymlfile: # opens
         cfg = yaml.load(ymlfile, Loader=yaml.SafeLoader)
         survey = simple_adl.survey.Survey(cfg)
 
@@ -195,6 +196,14 @@ if __name__ == '__main__':
     #---------------------------------------------------------------------------
 
     region.load_data()
+
+    #star_filter = (region.star_filter(region.data) == 1)
+    
+    #stars = region.data[star_filter]
+
+    #print(stars)
+
+
     print('Found {} objects'.format(len(region.data)))
     if (len(region.data) == 0):
         print('Ending search.')
@@ -202,7 +211,7 @@ if __name__ == '__main__':
 
     #---------------------------------------------------------------------------
 
-    distance_modulus_search_array = np.arange(16., survey.catalog['mag_max'], 0.5)
+    distance_modulus_search_array = np.arange(16., survey.catalog['mag_max'], 0.5) # RADIUS original # just for distance modulus guess
 
     #results = [np.empty((1,9)) for distance_modulus in distance_modulus_search_array]
 
@@ -220,7 +229,7 @@ if __name__ == '__main__':
                                               region.data[survey.mag_err_2],
                                               iso,
                                               survey.catalog['mag_max'],
-                                              radius=0.1)
+                                              radius=0.1) # radius already small
                            for iso in iso_search_array]
 
     #data_array = [region.data[iso_sel] for iso_sel in iso_selection_array]

@@ -49,18 +49,18 @@ if __name__ == '__main__':
     region = simple_adl.survey.Region(survey, args.ra, args.dec)
     print('Plot coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})'.format(region.ra, region.dec))
 
-    region.load_data(stars=True, galaxies=True)
+   
+    data = region.load_data(stars=True, galaxies=False)
+    stars = data
+
+    galaxies = region.load_data(stars=False, galaxies=True)
+
     print('Found {} objects'.format(len(region.data)))
     if (len(region.data) == 0):
         print('Ending search.')
         exit()
 
 
-    stars = region.data[0]
-    galaxies = region.data[1]
-
-
-    data = stars
 
     #---------------------------------------------------------------------------
 
@@ -72,7 +72,17 @@ if __name__ == '__main__':
     if args.mod:
         iso.distance_modulus = args.mod
     #iso_sep = iso.separation(data[mag_1], data[mag_2])
-    iso_filter = cut_isochrone_path(data[survey.mag_dered_1], data[survey.mag_dered_2], data[survey.mag_err_1], data[survey.mag_err_2], iso, mag_max=survey.catalog['mag_max'], radius=0.1, return_all=False)
+
+
+    iso_filter = cut_isochrone_path(
+        data[survey.mag_dered_1], 
+        data[survey.mag_dered_2], 
+        data[survey.mag_err_1], 
+        data[survey.mag_err_2], 
+        iso, 
+        mag_max=survey.catalog['mag_max'], 
+        radius=0.1, 
+        return_all=False)
     
     # projection of image
     proj = region.proj

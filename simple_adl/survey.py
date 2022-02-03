@@ -2,7 +2,7 @@
 """
 Generic python script.
 """
-__author__ = "Sidney Mau"
+__author__ = "Sidney Mau and Joanna Sakowska"
 
 import glob
 import os
@@ -15,6 +15,8 @@ import scipy.ndimage
 
 import simple_adl.query_dl
 import simple_adl.projector
+
+import fitsio as fits
 
 #-------------------------------------------------------------------------------
 
@@ -94,14 +96,116 @@ class Region():
         self.proj = simple_adl.projector.Projector(self.ra, self.dec)
         self.pix_center = hp.ang2pix(self.nside, self.ra, self.dec, lonlat=True)
 
-    def load_data(self, stars=True, galaxies=False):
-        # SM: to query the equivalent of hp.get_all_neighbors() for nside=32,
-        #     choose a radius of 3 deg:
-        #>>> np.sqrt((1/np.pi)*8*hp.nside2pixarea(nside=32, degrees=True))
-        #2.9238630046262855
-        data = simple_adl.query_dl.query(self.survey.catalog['profile'], self.ra, self.dec, radius=3.0, gmax=self.survey.catalog['mag_max'], stars=stars, galaxies=galaxies)
-        self.data = data
+
+
+    def star_filter(self, data):
+        """Return stellar-like objects"""
+
+        sel = (data['chi'] < 3) \
+            & (data['prob'] < 10) \
+            & (np.abs(data['sharp']) < 0.8) \
+            & (data['gmag0'] < 23.5) \
+            & (data['rmag0'] < 23.5) \
+            & (np.abs(data['gmag0'] - data['rmag0']) < 1)
         
+        return sel
+
+
+
+    def galaxy_filter(survey, data):
+        """Return galaxy-like objects"""
+
+        sel = (data['prob'] < 10) \
+            & (np.abs(data['sharp']) >= 0.8) \
+            & (data['gmag0'] < 23.5) \
+            & (data['rmag0'] < 23.5) \
+            & (np.abs(data['gmag0'] - data['rmag0']) < 1)
+        
+        return sel
+        
+
+
+    #def load_data(self, stars=True, galaxies=False):
+       # SM: to query the equivalent of hp.get_all_neighbors() for nside=32,
+       #     choose a radius of 3 deg:
+       #>>> np.sqrt((1/np.pi)*8*hp.nside2pixarea(nside=32, degrees=True)) = 2.9238
+       
+    #   data = simple_adl.query_dl.query(self.survey.catalog['profile'], self.ra, self.dec, radius=3.0, gmax=self.survey.catalog['mag_max'], stars=stars, galaxies=galaxies)
+    #   self.data = data
+
+       
+    ## Below is simple ORIGINAL way of reading local catalogues:   
+    #def construct_real_data(pix_nside_neighbors):
+
+    #data_array = []
+    #for pix_nside in pix_nside_neighbors:
+        
+    ##    JS: To match catalogue name / e.g. catalogue is divided into healpix.fits etc
+    ##         for MC, the catalogue is in bricks. Could combine it into healpix?
+
+    #    inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside)) 
+    #    for infile in inlist:
+    #        if not os.path.exists(infile):
+    #            continue
+    #        #reader = pyfits.open(infile) # JS: opens catalogue using pyfits
+    #        #data_array.append(reader[1].data) # JS: see load_data()
+    #        #reader.close()
+    #        data_array.append(fits.read(infile)) 
+    #data = np.concatenate(data_array)
+
+
+    def load_data(self, stars=True, galaxies=False):
+        """
+        Load local catalogue data by healpix
+        Apply star and galaxy filters
+        """
+    
+        data_array = [] 
+        data_dir = "/home/js01093/dwarf/simple_adl/simple_adl/data_dir/delvemc_blue" # Temp for now
+
+        pix_nside_select = hp.ang2pix(nside=self.nside, theta=self.ra, phi=self.dec, nest=False, lonlat=True)
+
+        pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(self.nside, pix_nside_select)])
+
+        print('Center healpixel: {}'.format(pix_nside_select))
+        print('Healpixels: {}'.format(pix_nside_neighbors))
+
+        for pix_nside in pix_nside_neighbors:
+
+            inlist = glob.glob('{}/*_{:05d}.fits'.format(data_dir, pix_nside))
+       
+            for infile in inlist:
+                print(infile)
+                if not os.path.exists(infile):
+                    continue
+                data_array.append(fits.read(infile))
+
+        data_raw = np.concatenate(data_array) # JS: Extend data array, here we extend with neighbouring healpix data too?
+
+        # Return stars:
+
+        if stars == True:
+
+            star_filter = (self.star_filter(data_raw) == 1)
+            
+            data = data_raw[star_filter]
+          
+
+        # Return galaxies:
+
+        elif galaxies == True:
+
+            galaxy_filter = (self.galaxy_filter(data_raw) == 1)
+
+            data = data_raw[galaxy_filter]
+            
+        self.data = data
+
+        return self.data
+
+
+
+
     def characteristic_density(self, iso_sel):
         """
         Compute the characteristic density of a region
@@ -255,7 +359,7 @@ class Region():
         #x_full, y_full = proj.sphereToImage(data[basis_1], data[basis_2]) # If we want to use full magnitude range for significance evaluation
         delta_x = 0.01
         area = delta_x**2
-        smoothing = 2. / 60. # Was 3 arcmin
+        smoothing = 2. / 60. # Was 3 arcmin #JS: now is 2
         bins = np.arange(-8., 8. + 1.e-10, delta_x)
         #bins = np.arange(-4., 4. + 1.e-10, delta_x) # SM: not sure what to prefer here...
         centers = 0.5 * (bins[0: -1] + bins[1:])
@@ -275,7 +379,7 @@ class Region():
             # until there are fewer than 10 disconnected peaks
             h_region, n_region = scipy.ndimage.measurements.label((h_g * cutcut) > (area * characteristic_density * factor))
             #print 'factor', factor, n_region, n_region < 10
-            if n_region < 10:
+            if n_region < 10: # JS: here?
                 threshold_density = area * characteristic_density * factor
                 break
     

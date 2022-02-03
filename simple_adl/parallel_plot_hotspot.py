@@ -30,7 +30,7 @@ from multiprocessing import Pool
 # Use $ lspcu to check how many threads per core
 # e.g. Joanna's has 2 per core, so max 14 threads = 7 cores
 
-n_threads = 14
+n_threads = 1
 
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
@@ -83,10 +83,10 @@ if __name__ == '__main__':
     #candidates = pd.read_csv('{}/{}.csv'.format(results_dir, 'out'), delimiter=',', header=None)
 
     # To read in candidates after make_list.py
-    #candidates = pd.read_csv('{}.csv'.format('candidate_list'), delimiter=',', header=None)
+    candidates = pd.read_csv('{}.csv'.format('candidate_list'), delimiter=',', header=None)
 
     # To read in candidates AFTER 5 sigma cut
-    candidates = pd.read_csv('{}.csv'.format('candidate_list_5sig'), delimiter=',', header=None)
+    #candidates = pd.read_csv('{}.csv'.format('candidate_list_5sig'), delimiter=',', header=None)
 
     ra_candidate_all, dec_candidate_all, mod_candidate_all = [], [], []
 
@@ -115,5 +115,7 @@ if __name__ == '__main__':
 
     with Pool(n_threads) as p:
         p.starmap(submit_plot_job, plot_arguments)
+
+    print('doneeeeeeeeeeeeeee')
         
 

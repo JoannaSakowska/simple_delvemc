@@ -2,7 +2,7 @@
 """
 Perform simple binning search
 """
-__author__ = "Sidney Mau"
+__author__ = "Joanna Sakowska"
 
 import os
 import glob
@@ -102,8 +102,18 @@ if __name__ == '__main__':
     with open(args.config, 'r') as ymlfile:
         cfg = yaml.load(ymlfile, Loader=yaml.SafeLoader)
 
+        # JDS: TO FIX
+        # Implement below structure to remove path dependencies for future version
+
+        #survey = cfg['survey']
+        #simple_dir = cfg['setup']['simple_dir']
+        #jobs = cfg['batch']['jobs']
+        #nside = cfg[survey]['nside']
+        #datadir = cfg[survey]['datadir']
+
     # JDS: To search locally
-    #infiles = glob.glob('{}/*.fits'.format(cfg['catalog']['dirname']))
+    #data_dir = '/home/js01093/dwarf/simple_adl/simple_adl/data_dir'
+    #infiles = glob.glob('{}/*.fits'.format(cfg['catalog']['data_dir']))
 
     # Reading in coordinates
     search_coordinates = pd.read_csv('{}.csv'.format('search_coordinates'), delimiter=',', header=None)
