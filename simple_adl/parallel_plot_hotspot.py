@@ -83,7 +83,7 @@ if __name__ == '__main__':
     #candidates = pd.read_csv('{}/{}.csv'.format(results_dir, 'out'), delimiter=',', header=None)
 
     # To read in candidates after make_list.py
-    candidates = pd.read_csv('{}.csv'.format('candidate_list'), delimiter=',', header=None)
+    candidates = pd.read_csv('{}.csv'.format('candidate_list'), delimiter=',', header=0)
 
     # To read in candidates AFTER 5 sigma cut
     #candidates = pd.read_csv('{}.csv'.format('candidate_list_5sig'), delimiter=',', header=None)

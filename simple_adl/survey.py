@@ -172,7 +172,7 @@ class Region():
 
         for pix_nside in pix_nside_neighbors:
 
-            inlist = glob.glob('{}/*_{:05d}.fits'.format(data_dir, pix_nside))
+            inlist = glob.glob('{}/*_{:05d}.fits'.format(data_dir, pix_nside)) # is it searching them *all* and returning strongest peaks right now?
        
             for infile in inlist:
                 print(infile)
@@ -190,7 +190,6 @@ class Region():
             
             data = data_raw[star_filter]
           
-
         # Return galaxies:
 
         elif galaxies == True:
@@ -199,6 +198,15 @@ class Region():
 
             data = data_raw[galaxy_filter]
             
+
+        # Return both?
+         
+        elif stars == True and galaxies == True:
+            
+            star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1)
+
+            data = data_raw[star_galaxy_filter]
+
         self.data = data
 
         return self.data
