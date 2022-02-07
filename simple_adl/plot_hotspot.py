@@ -78,7 +78,7 @@ if __name__ == '__main__':
     
     # Isochrone for stars
 
-    iso_filter = cut_isochrone_path(
+    iso_filter_stars = cut_isochrone_path(
         stars[survey.mag_dered_1], 
         stars[survey.mag_dered_2], 
         stars[survey.mag_err_1], 
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     
     # Filters
     #extension = 0.05 # JS: Minimised the radius to show closer objects
-    extension = 0.025
+    extension = 0.025 # Need to understand this further. # Objects less than 4.5 arcmin away from centre?
     r0 = 3.0 * extension # 3.0 # g-radius # can be minimised or made larger # IS R READ IN?
     r1 = 5.0 * extension # 5.0 # rnear
     r2 = np.sqrt(r0**2 + r1**2) # rfar
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     bound = 0.5
     steps = 100
     bins = np.linspace(-bound, bound, steps)
-    signal = np.histogram2d(x_stars[iso_filter], y_stars[iso_filter], bins=[bins, bins])[0]
+    signal = np.histogram2d(x_stars[iso_filter_stars], y_stars[iso_filter_stars], bins=[bins, bins])[0]
     sigma = 0.01 * (0.25 * np.arctan(0.25 * r0 * 60. - 1.5) + 1.3)
     convolution = scipy.ndimage.filters.gaussian_filter(signal, sigma/(bound/steps)).T
     pc = ax.pcolormesh(bins, bins, convolution, cmap='Greys', rasterized=True)
@@ -228,61 +228,33 @@ if __name__ == '__main__':
 
     #---------------------------------------------------------------------------
    
-    #file_name = 'candidate_{:0.2f}_{:0.2f}'.format(args.ra, args.dec)
-    #fig.savefig('./{}.pdf'.format(file_name), bbox_inches='tight')
-    #fig.savefig(os.path.join(survey.output['save_dir'],args.outfile), bbox_inches='tight')
-    #plt.close(fig)
-
-    #---------------------------------------------------------------------------
-    # TEST FIGS
-
-    #fig2, axs = plt.subplots(1, 3, figsize=(16, 4))
-    #fig2.subplots_adjust(wspace=0.5)
+    # Joanna additions
 
     #---------------------------------------------------------------------------
 
-    """Color-magnitude plot STARS"""
+    # CMD stars
+
     ax = axs[1,0]
     plt.sca(ax)
-
-
-    #angsep = ugali.utils.projector.angsep(ra, dec, data[basis_1], data[basis_2])
-    #annulus = (angsep > g_radius) & (angsep < 1.)
-
-    #if type == 'stars':
-    #    filter = simple.filters.star_filter(survey, data)
-    #    #ax.set_title('Stellar Color-Magnitude')
-    #    ax.text(0.05, 0.95, 'Stars', transform=ax.transAxes, verticalalignment='top')
-    #elif type == 'galaxies':
-    #    filter = simple.filters.galaxy_filter(survey, data)
-    #    #ax.set_title('Galactic Color-Magnitude')
-    #    ax.text(0.05, 0.95, 'Galaxies', transform=ax.transAxes, verticalalignment='top')
-
-    #iso_filter = simple.simple_utils.cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1, return_all=False)
-    
-    angsep = angsep
-    annulus = (angsep > r0) & (angsep < 1.)
-    nbhd = (angsep < r0)
+ 
+    angsep_stars = angsep
+    annulus = (angsep_stars > r0) & (angsep_stars < 1.)
+    nbhd = (angsep_stars < r0)
 
     ## Plot background objects
-    ax.scatter(stars[survey.mag_dered_1][annulus & iso_filter] - stars[survey.mag_dered_2][annulus & iso_filter], stars[survey.mag_dered_1][annulus & iso_filter], c='k', alpha=0.1, edgecolor='none', s=1)
+    ax.scatter(stars[survey.mag_dered_1][annulus & iso_filter_stars] - stars[survey.mag_dered_2][annulus & iso_filter_stars], stars[survey.mag_dered_1][annulus & iso_filter_stars], c='k', alpha=0.1, edgecolor='none', s=1)
 
     # FOCUS ON STARS
     ax.scatter(stars[survey.mag_dered_1][annulus] - stars[survey.mag_dered_2][annulus], stars[survey.mag_dered_1][annulus], c='k', alpha=0.1, edgecolor='none', s=1)
 
     ## Plot isochrone
-    ##ugali.utils.plotting.drawIsochrone(iso, lw=2, label='{} Gyr, z = {}'.format(iso.age, iso.metallicity))
-    #ax.plot(iso.color, iso.mag_1 + iso.distance_modulus, c='k', lw=1)
     ax.plot(iso.color, iso.mag + iso.distance_modulus, c='k', lw=1)
 
     ## Plot objects in nbhd
-    #ax.scatter(data[mag_dered_1][filter & nbhd] - data[mag_dered_2][filter & nbhd], data[mag_dered_1][filter & nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(g_radius))
     ax.scatter(stars[survey.mag_dered_1][nbhd] - stars[survey.mag_dered_2][nbhd], stars[survey.mag_dered_1][nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(r0))
 
     ## Plot objects in nbhd and near isochrone
-    #ax.scatter(data[mag_dered_1][filter & nbhd & iso_filter] - data[mag_dered_2][filter & nbhd & iso_filter], data[mag_dered_1][filter & nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
-
-    ax.scatter(stars[survey.mag_dered_1][nbhd & iso_filter] - stars[survey.mag_dered_2][nbhd & iso_filter], stars[survey.mag_dered_1][nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
+    ax.scatter(stars[survey.mag_dered_1][nbhd & iso_filter_stars] - stars[survey.mag_dered_2][nbhd & iso_filter_stars], stars[survey.mag_dered_1][nbhd & iso_filter_stars], c='r', s=5, label='$\Delta$CM < 0.1')
 
     ax.legend(loc='upper right')
 
@@ -290,34 +262,25 @@ if __name__ == '__main__':
     ax.set_ylim(survey.catalog['mag_max'], 16)
     ax.text(0.05, 0.95, 'Stars', transform=ax.transAxes, verticalalignment='top', bbox=props)
 
-    #ax.set_xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
-    #ax.set_ylabel('{} (mag)'.format(band_1.lower()))
+    ax.set_xlabel('${} - {}$'.format(survey.band_1.lower(), survey.band_2.lower()))
+    ax.set_ylabel('${}$'.format(survey.band_1.lower()))
 
-    """Color-magnitude plot GALAXIES"""
+    #---------------------------------------------------------------------------
+
+    # CMD galaxies    
+    
     ax = axs[1,1]    
     plt.sca(ax)
 
 
-    #angsep = ugali.utils.projector.angsep(ra, dec, data[basis_1], data[basis_2])
-    #annulus = (angsep > g_radius) & (angsep < 1.)
+    angsep_galaxies = simple_adl.coordinate_tools.angsep(args.ra, args.dec, galaxies[survey.catalog['basis_1']], galaxies[survey.catalog['basis_2']])
 
-    #if type == 'stars':
-    #    filter = simple.filters.star_filter(survey, data)
-    #    #ax.set_title('Stellar Color-Magnitude')
-    #    ax.text(0.05, 0.95, 'Stars', transform=ax.transAxes, verticalalignment='top')
-    #elif type == 'galaxies':
-    #    filter = simple.filters.galaxy_filter(survey, data)
-    #    #ax.set_title('Galactic Color-Magnitude')
-    #    ax.text(0.05, 0.95, 'Galaxies', transform=ax.transAxes, verticalalignment='top')
+    annulus = (angsep_galaxies > r0) & (angsep_galaxies < 1.)
+    nbhd = (angsep_galaxies < r0)
 
-    #iso_filter = simple.simple_utils.cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1, return_all=False)
-    
-    angsep2 = simple_adl.coordinate_tools.angsep(args.ra, args.dec, galaxies[survey.catalog['basis_1']], galaxies[survey.catalog['basis_2']])
+    # isochrone for galaxies 
 
-    annulus = (angsep2 > r0) & (angsep2 < 1.)
-    nbhd = (angsep2 < r0)
-
-    iso_filter = cut_isochrone_path(
+    iso_filter_galaxies = cut_isochrone_path(
         galaxies[survey.mag_dered_1], 
         galaxies[survey.mag_dered_2], 
         galaxies[survey.mag_err_1], 
@@ -327,33 +290,52 @@ if __name__ == '__main__':
         radius=0.1, 
         return_all=False)
 
-    ## Plot background objects
-    ax.scatter(galaxies[survey.mag_dered_1][annulus & iso_filter] - galaxies[survey.mag_dered_2][annulus & iso_filter], galaxies[survey.mag_dered_1][annulus & iso_filter], c='k', alpha=0.1, edgecolor='none', s=1)
+    # Plot background objects
+    ax.scatter(galaxies[survey.mag_dered_1][annulus & iso_filter_galaxies] - galaxies[survey.mag_dered_2][annulus & iso_filter_galaxies], galaxies[survey.mag_dered_1][annulus & iso_filter_galaxies], c='k', alpha=0.1, edgecolor='none', s=1)
 
-    # FOCUS ON GALAXIES
+    # Galaxies
     ax.scatter(galaxies[survey.mag_dered_1][annulus] - galaxies[survey.mag_dered_2][annulus], galaxies[survey.mag_dered_1][annulus], c='k', alpha=0.1, edgecolor='none', s=1)
 
-    ## Plot isochrone
-    ##ugali.utils.plotting.drawIsochrone(iso, lw=2, label='{} Gyr, z = {}'.format(iso.age, iso.metallicity))
-    #ax.plot(iso.color, iso.mag_1 + iso.distance_modulus, c='k', lw=1)
+    # Plot isochrone
     ax.plot(iso.color, iso.mag + iso.distance_modulus, c='k', lw=1)
 
-    ## Plot objects in nbhd
-    #ax.scatter(data[mag_dered_1][filter & nbhd] - data[mag_dered_2][filter & nbhd], data[mag_dered_1][filter & nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(g_radius))
+    # Plot objects in nbhd
     ax.scatter(galaxies[survey.mag_dered_1][nbhd] - galaxies[survey.mag_dered_2][nbhd], galaxies[survey.mag_dered_1][nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(r0))
 
-    ## Plot objects in nbhd and near isochrone
-    #ax.scatter(data[mag_dered_1][filter & nbhd & iso_filter] - data[mag_dered_2][filter & nbhd & iso_filter], data[mag_dered_1][filter & nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
-
-    ax.scatter(galaxies[survey.mag_dered_1][nbhd & iso_filter] - galaxies[survey.mag_dered_2][nbhd & iso_filter], galaxies[survey.mag_dered_1][nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
+    # Plot objects in nbhd and near isochrone
+    ax.scatter(galaxies[survey.mag_dered_1][nbhd & iso_filter_galaxies] - galaxies[survey.mag_dered_2][nbhd & iso_filter_galaxies], galaxies[survey.mag_dered_1][nbhd & iso_filter_galaxies], c='r', s=5, label='$\Delta$CM < 0.1')
 
     ax.legend(loc='upper right')
 
     ax.set_xlim(-0.5, 1)
     ax.set_ylim(survey.catalog['mag_max'], 16)
-    #ax.set_xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
-    #ax.set_ylabel('{} (mag)'.format(band_1.lower()))
+    ax.set_xlabel('${} - {}$'.format(survey.band_1.lower(), survey.band_2.lower()))
+    ax.set_ylabel('${}$'.format(survey.band_1.lower()))
     ax.text(0.05, 0.95, 'Galaxies', transform=ax.transAxes, verticalalignment='top', bbox=props)
+
+
+    #---------------------------------------------------------------------------
+
+    # Star plot  
+
+    ax = axs[1,2]    
+    plt.sca(ax)
+
+    angsep_stars = angsep
+    
+    # Take region
+    proj = region.proj
+
+    x_stars, y_stars = proj.sphereToImage(stars[iso_filter_stars][survey.catalog['basis_1']], stars[iso_filter_stars][survey.catalog['basis_2']])
+    
+
+    ax.scatter(x_stars, y_stars, edgecolor='none', s=3, c='black')
+
+    ax.set_xlim(0.25, -0.25)
+    ax.set_ylim(-0.25, 0.25)
+    ax.set_xlabel(r'$\Delta$ RA (deg)')
+    ax.set_ylabel(r'$\Delta$ Dec (deg)')
+    #ax.set_title('Stars')
 
 
 
