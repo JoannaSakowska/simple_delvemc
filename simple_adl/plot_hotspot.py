@@ -105,10 +105,10 @@ if __name__ == '__main__':
     r0 = 3.0 * extension # 3.0 # g-radius # can be minimised or made larger # IS R READ IN?
     r1 = 5.0 * extension # 5.0 # rnear
     r2 = np.sqrt(r0**2 + r1**2) # rfar
-    angsep = simple_adl.coordinate_tools.angsep(args.ra, args.dec, stars[survey.catalog['basis_1']], stars[survey.catalog['basis_2']])
-    inner = (angsep < r0)
-    outer = ((angsep > r1) & (angsep < r2))
-    background = (angsep > r2)
+    angsep_stars = simple_adl.coordinate_tools.angsep(args.ra, args.dec, stars[survey.catalog['basis_1']], stars[survey.catalog['basis_2']])
+    inner = (angsep_stars < r0)
+    outer = ((angsep_stars > r1) & (angsep_stars < r2))
+    background = (angsep_stars > r2)
 
     #---------------------------------------------------------------------------
 
@@ -237,24 +237,24 @@ if __name__ == '__main__':
     ax = axs[1,0]
     plt.sca(ax)
  
-    angsep_stars = angsep
-    annulus = (angsep_stars > r0) & (angsep_stars < 1.)
-    nbhd = (angsep_stars < r0)
+    angsep_stars = angsep_stars
+    annulus_stars = (angsep_stars > r0) & (angsep_stars < 1.)
+    nbhd_stars = (angsep_stars < r0)
 
     ## Plot background objects
-    ax.scatter(stars[survey.mag_dered_1][annulus & iso_filter_stars] - stars[survey.mag_dered_2][annulus & iso_filter_stars], stars[survey.mag_dered_1][annulus & iso_filter_stars], c='k', alpha=0.1, edgecolor='none', s=1)
+    ax.scatter(stars[survey.mag_dered_1][annulus_stars & iso_filter_stars] - stars[survey.mag_dered_2][annulus_stars & iso_filter_stars], stars[survey.mag_dered_1][annulus_stars & iso_filter_stars], c='k', alpha=0.1, edgecolor='none', s=1)
 
-    # FOCUS ON STARS
-    ax.scatter(stars[survey.mag_dered_1][annulus] - stars[survey.mag_dered_2][annulus], stars[survey.mag_dered_1][annulus], c='k', alpha=0.1, edgecolor='none', s=1)
+    # Stars
+    ax.scatter(stars[survey.mag_dered_1][annulus_stars] - stars[survey.mag_dered_2][annulus_stars], stars[survey.mag_dered_1][annulus_stars], c='k', alpha=0.1, edgecolor='none', s=1)
 
     ## Plot isochrone
     ax.plot(iso.color, iso.mag + iso.distance_modulus, c='k', lw=1)
 
     ## Plot objects in nbhd
-    ax.scatter(stars[survey.mag_dered_1][nbhd] - stars[survey.mag_dered_2][nbhd], stars[survey.mag_dered_1][nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(r0))
+    ax.scatter(stars[survey.mag_dered_1][nbhd_stars] - stars[survey.mag_dered_2][nbhd_stars], stars[survey.mag_dered_1][nbhd_stars], c='g', s=5, label='r < {:.3f}$^\circ$'.format(r0))
 
     ## Plot objects in nbhd and near isochrone
-    ax.scatter(stars[survey.mag_dered_1][nbhd & iso_filter_stars] - stars[survey.mag_dered_2][nbhd & iso_filter_stars], stars[survey.mag_dered_1][nbhd & iso_filter_stars], c='r', s=5, label='$\Delta$CM < 0.1')
+    ax.scatter(stars[survey.mag_dered_1][nbhd_stars & iso_filter_stars] - stars[survey.mag_dered_2][nbhd_stars & iso_filter_stars], stars[survey.mag_dered_1][nbhd_stars & iso_filter_stars], c='r', s=5, label='$\Delta$CM < 0.1')
 
     ax.legend(loc='upper right')
 
@@ -275,8 +275,8 @@ if __name__ == '__main__':
 
     angsep_galaxies = simple_adl.coordinate_tools.angsep(args.ra, args.dec, galaxies[survey.catalog['basis_1']], galaxies[survey.catalog['basis_2']])
 
-    annulus = (angsep_galaxies > r0) & (angsep_galaxies < 1.)
-    nbhd = (angsep_galaxies < r0)
+    annulus_galaxies = (angsep_galaxies > r0) & (angsep_galaxies < 1.)
+    nbhd_galaxies = (angsep_galaxies < r0)
 
     # isochrone for galaxies 
 
@@ -291,19 +291,19 @@ if __name__ == '__main__':
         return_all=False)
 
     # Plot background objects
-    ax.scatter(galaxies[survey.mag_dered_1][annulus & iso_filter_galaxies] - galaxies[survey.mag_dered_2][annulus & iso_filter_galaxies], galaxies[survey.mag_dered_1][annulus & iso_filter_galaxies], c='k', alpha=0.1, edgecolor='none', s=1)
+    ax.scatter(galaxies[survey.mag_dered_1][annulus_galaxies & iso_filter_galaxies] - galaxies[survey.mag_dered_2][annulus_galaxies & iso_filter_galaxies], galaxies[survey.mag_dered_1][annulus_galaxies & iso_filter_galaxies], c='k', alpha=0.1, edgecolor='none', s=1)
 
     # Galaxies
-    ax.scatter(galaxies[survey.mag_dered_1][annulus] - galaxies[survey.mag_dered_2][annulus], galaxies[survey.mag_dered_1][annulus], c='k', alpha=0.1, edgecolor='none', s=1)
+    ax.scatter(galaxies[survey.mag_dered_1][annulus_galaxies] - galaxies[survey.mag_dered_2][annulus_galaxies], galaxies[survey.mag_dered_1][annulus_galaxies], c='k', alpha=0.1, edgecolor='none', s=1)
 
     # Plot isochrone
     ax.plot(iso.color, iso.mag + iso.distance_modulus, c='k', lw=1)
 
     # Plot objects in nbhd
-    ax.scatter(galaxies[survey.mag_dered_1][nbhd] - galaxies[survey.mag_dered_2][nbhd], galaxies[survey.mag_dered_1][nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(r0))
+    ax.scatter(galaxies[survey.mag_dered_1][nbhd_galaxies] - galaxies[survey.mag_dered_2][nbhd_galaxies], galaxies[survey.mag_dered_1][nbhd_galaxies], c='g', s=5, label='r < {:.3f}$^\circ$'.format(r0))
 
     # Plot objects in nbhd and near isochrone
-    ax.scatter(galaxies[survey.mag_dered_1][nbhd & iso_filter_galaxies] - galaxies[survey.mag_dered_2][nbhd & iso_filter_galaxies], galaxies[survey.mag_dered_1][nbhd & iso_filter_galaxies], c='r', s=5, label='$\Delta$CM < 0.1')
+    ax.scatter(galaxies[survey.mag_dered_1][nbhd_galaxies & iso_filter_galaxies] - galaxies[survey.mag_dered_2][nbhd_galaxies & iso_filter_galaxies], galaxies[survey.mag_dered_1][nbhd_galaxies & iso_filter_galaxies], c='r', s=5, label='$\Delta$CM < 0.1')
 
     ax.legend(loc='upper right')
 
@@ -321,20 +321,33 @@ if __name__ == '__main__':
     ax = axs[0,2]    
     plt.sca(ax)
 
-    angsep_stars = angsep
+    angsep_stars = angsep_stars
     
     # Take region
     proj = region.proj
 
-    x_stars, y_stars = proj.sphereToImage(stars[iso_filter_stars][survey.catalog['basis_1']], stars[iso_filter_stars][survey.catalog['basis_2']])
-    
+    # Checking to see how not isochrone filtered stars are distributed:
+    # This is *not* the original setting
+    x_stars_no_iso, y_stars_no_iso = proj.sphereToImage(stars[survey.catalog['basis_1']], stars[survey.catalog['basis_2']])
+    ax.scatter(x_stars_no_iso, y_stars_no_iso, edgecolor='none', s=3, c='black')
 
-    ax.scatter(x_stars, y_stars, edgecolor='none', s=3, c='black')
+    # Below plots stars that are isochrone filtered *already*
+    # This is the original plot setting
+    x_stars, y_stars = proj.sphereToImage(stars[iso_filter_stars][survey.catalog['basis_1']], stars[iso_filter_stars][survey.catalog['basis_2']])
+
+    #ax.scatter(x_stars, y_stars, edgecolor='none', s=3, c='black')
+    ax.scatter(x_stars, y_stars, edgecolor='none', s=5, c='green', label='r < {:.3f}$^\circ$'.format(r0))
+
+    # Overplot isochrone filtered stars in nbhd
+    x_stars_nbhd, y_stars_nbhd = proj.sphereToImage(stars[iso_filter_stars & nbhd_stars][survey.catalog['basis_1']], stars[iso_filter_stars & nbhd_stars][survey.catalog['basis_2']])
+    ax.scatter(x_stars_nbhd, y_stars_nbhd, edgecolor='none', s=7, c='r', label='$\Delta$CM < 0.1')
 
     ax.set_xlim(0.25, -0.25)
     ax.set_ylim(-0.25, 0.25)
     ax.set_xlabel(r'$\Delta$ RA (deg)')
     ax.set_ylabel(r'$\Delta$ Dec (deg)')
+    ax.legend(loc='upper right')
+
     #ax.set_title('Stars')
 
 
