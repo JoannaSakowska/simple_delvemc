@@ -175,7 +175,6 @@ class Region():
             inlist = glob.glob('{}/*_{:05d}.fits'.format(data_dir, pix_nside)) # is it searching them *all* and returning strongest peaks right now?
        
             for infile in inlist:
-                print(infile)
                 if not os.path.exists(infile):
                     continue
                 data_array.append(fits.read(infile))

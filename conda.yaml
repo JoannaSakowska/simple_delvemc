@@ -10,5 +10,6 @@ dependencies:
   - pip
   - pyyaml
   - scipy
+  - fitsio
   - pip:
     - noaodatalab

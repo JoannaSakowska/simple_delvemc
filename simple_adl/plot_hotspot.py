@@ -197,7 +197,7 @@ if __name__ == '__main__':
     
     # Hess
     #ax = axs[1]
-    ax = axs[0,2]
+    ax = axs[1,2]
     plt.sca(ax)
     
     xbins = np.arange(-0.3, 1.1, 0.1)
@@ -318,7 +318,7 @@ if __name__ == '__main__':
 
     # Star plot  
 
-    ax = axs[1,2]    
+    ax = axs[0,2]    
     plt.sca(ax)
 
     angsep_stars = angsep
