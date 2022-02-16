@@ -268,7 +268,6 @@ if __name__ == '__main__':
             continue
         sep = angsep(ra_peak_array[ii], dec_peak_array[ii], ra_peak_array, dec_peak_array)
         sig_peak_array[(sep < r_peak_array[ii]) & (np.arange(len(sig_peak_array)) > ii)] = -1.
-        #sig_peak_array[(sep < 0.5) & (np.arange(len(sig_peak_array)) > ii)] = -1. # 0.5 deg radius
     
     # Prune the list of peaks
     ra_peak_array = ra_peak_array[sig_peak_array > 0.]

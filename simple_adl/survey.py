@@ -13,7 +13,7 @@ import scipy.stats
 import scipy.interpolate
 import scipy.ndimage
 
-import simple_adl.query_dl
+#import simple_adl.query_dl # Legacy
 import simple_adl.projector
 
 import fitsio as fits

@@ -100,11 +100,11 @@ if __name__ == '__main__':
     color = stars[survey.mag_dered_1] - stars[survey.mag_dered_2]
     
     # Filters
-    #extension = 0.05 # JS: Minimised the radius to show closer objects
-    extension = 0.025 # Need to understand this further. # Objects less than 4.5 arcmin away from centre?
-    r0 = 3.0 * extension # 3.0 # g-radius # can be minimised or made larger # IS R READ IN?
-    r1 = 5.0 * extension # 5.0 # rnear
-    r2 = np.sqrt(r0**2 + r1**2) # rfar
+    #extension = 0.05 
+    extension = 0.025 #JS: Minimised the extension
+    r0 = 3.0 * extension # 3.0 # set as g-radius 
+    r1 = 5.0 * extension # 5.0 rnear? 
+    r2 = np.sqrt(r0**2 + r1**2) # rfar?
     angsep_stars = simple_adl.coordinate_tools.angsep(args.ra, args.dec, stars[survey.catalog['basis_1']], stars[survey.catalog['basis_2']])
     inner = (angsep_stars < r0)
     outer = ((angsep_stars > r1) & (angsep_stars < r2))
