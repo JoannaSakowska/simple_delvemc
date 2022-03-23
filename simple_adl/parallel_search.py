@@ -50,18 +50,52 @@ n_threads = 3
 #    print('Process id:', os.getpid())
 
 
-def submit_job(ra, dec):
+# def submit_job(ra, dec):
+    
+#     # Output
+#     outfile = 'results_{:0.2f}_{:0.2f}.csv'.format(ra, dec)
+
+#     # Commands
+#     command = 'python {}/search.py --ra {:0.2f} --dec {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, outfile)
+
+#     # Log
+#     # Change log directory here
+#     log_dir = '/home/js01093/dwarf/simple_adl/simple_adl/log_dir'
+#     log_name = '{}/results_{:0.2f}_{:0.2f}.log'.format(log_dir, ra, dec)
+
+#     # Main function
+
+#     print(command)
+
+#     log = open(log_name, "w")
+
+#     search_output = (
+#         subprocess.run(
+#             command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+#         )
+#         .stdout.decode("utf-8")
+#     )
+
+#     print(search_output)
+    
+#     log.write(str(search_output))
+    
+#     log.close()
+
+#     return
+
+def submit_job(healpix_id):
     
     # Output
-    outfile = 'results_{:0.2f}_{:0.2f}.csv'.format(ra, dec)
+    outfile = 'results_{}.csv'.format(healpix_id)
 
     # Commands
-    command = 'python {}/search.py --ra {:0.2f} --dec {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, outfile)
+    command = 'python {}/search.py --nside 32 --ipix {} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), healpix_id, outfile)
 
     # Log
     # Change log directory here
     log_dir = '/home/js01093/dwarf/simple_adl/simple_adl/log_dir'
-    log_name = '{}/results_{:0.2f}_{:0.2f}.log'.format(log_dir, ra, dec)
+    log_name = '{}/results_{}.log'.format(log_dir, healpix_id)
 
     # Main function
 
@@ -112,35 +146,35 @@ if __name__ == '__main__':
         #datadir = cfg[survey]['datadir']
 
     # JDS: To search locally
-    #data_dir = '/home/js01093/dwarf/simple_adl/simple_adl/data_dir'
-    #infiles = glob.glob('{}/*.fits'.format(cfg['catalog']['data_dir']))
+    data_dir = '/home/js01093/dwarf/simple_adl/simple_adl/data_dir/'
+    infiles = glob.glob('{}/*.fits'.format(cfg['catalog']['data_dir'])) # use code from reading files in search.py
 
-    # Reading in coordinates
-    search_coordinates = pd.read_csv('{}.csv'.format('search_coordinates'), delimiter=',', header=None)
+    ## Reading in coordinates
+    #search_coordinates = pd.read_csv('{}.csv'.format('search_coordinates'), delimiter=',', header=None)
 
-    ra_search_all, dec_search_all = [], []
+    #ra_search_all, dec_search_all = [], []
 
     results_dir = '/home/js01093/dwarf/simple_adl/simple_adl/results_dir/'
 
-    ra_search_all.extend(search_coordinates.iloc[:,0])
-    dec_search_all.extend(search_coordinates.iloc[:,1])
+    #ra_search_all.extend(search_coordinates.iloc[:,0])
+    #dec_search_all.extend(search_coordinates.iloc[:,1])
 
-    ra_search, dec_search = [], []
+    #ra_search, dec_search = [], []
 
-    for ra, dec in zip(ra_search_all, dec_search_all):
-        if os.path.exists(os.path.join(results_dir, 'results_{:0.2f}_{:0.2f}.csv'.format(ra, dec))):
-            print('EXISTS results_{:0.2f}_{:0.2f}.csv'.format(ra, dec))
-        else:
-            ra_search.append(ra)
-            dec_search.append(dec)
+    #for ra, dec in zip(ra_search_all, dec_search_all):
+    #    if os.path.exists(os.path.join(results_dir, 'results_{:0.2f}_{:0.2f}.csv'.format(ra, dec))):
+    #        print('EXISTS results_{:0.2f}_{:0.2f}.csv'.format(ra, dec))
+    #    else:
+    #        ra_search.append(ra)
+    #        dec_search.append(dec)
 
     # Clean memory
-    ra_search_all, dec_search_all = [], []
+    #ra_search_all, dec_search_all = [], []
 
     print('Ready to search the Magellanic Clouds!')
 
     # Zipping arguments for command
-    search_arguments = [*zip(ra_search,dec_search)]
+    #search_arguments = [*zip(ra_search,dec_search)]
 
     with Pool(n_threads) as p:
         p.starmap(submit_job, search_arguments)

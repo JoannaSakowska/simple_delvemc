@@ -38,13 +38,13 @@ n_threads = 1
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 #
 
-def submit_plot_job(ra, dec, mod):
+def submit_plot_job(ra, dec, mod, radius):
     
     # Output
     outfile = 'candidate_{:0.2f}_{:0.2f}.png'.format(ra, dec)
     
     # Commands
-    command = 'python {}/plot_hotspot.py --ra {:0.2f} --dec {:0.2f} --mod {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, mod, outfile)
+    command = 'python {}/plot_hotspot.py --ra {:0.2f} --dec {:0.2f} --mod {:0.2f} --radius {:0.2f} --outfile {}'.format(os.path.dirname(simple_adl.search.__file__), ra, dec, mod, radius, outfile)
     print(command)
     print('Preparing plotting jobs...')
     subprocess.run(command.split(' '), shell=False)
@@ -88,30 +88,33 @@ if __name__ == '__main__':
     # To read in candidates AFTER 5 sigma cut
     #candidates = pd.read_csv('{}.csv'.format('candidate_list_5sig'), delimiter=',', header=None)
 
-    ra_candidate_all, dec_candidate_all, mod_candidate_all = [], [], []
+    ra_candidate_all, dec_candidate_all, mod_candidate_all, radius_candidate_all = [], [], [], []
 
     ra_candidate_all.extend(candidates.iloc[:,1])
     dec_candidate_all.extend(candidates.iloc[:,2])
     mod_candidate_all.extend(candidates.iloc[:,3])
+    radius_candidate_all.extend(candidates.iloc[:,4])
 
-    ra_candidate, dec_candidate, mod_candidate = [], [], []
+
+    ra_candidate, dec_candidate, mod_candidate, radius_candidate = [], [], [], []
 
     # JDS: Method to skip overwriting plots in plot_dir
-    for ra, dec, mod in zip(ra_candidate_all, dec_candidate_all, mod_candidate_all):
+    for ra, dec, mod, radius in zip(ra_candidate_all, dec_candidate_all, mod_candidate_all, radius_candidate_all):
         if os.path.exists(os.path.join(plots_dir, 'candidate_{:0.2f}_{:0.2f}.png'.format(ra, dec))):
             print('EXISTS candidate_{:0.2f}_{:0.2f}.png'.format(ra, dec))
         else:
             ra_candidate.append(ra)
             dec_candidate.append(dec)
             mod_candidate.append(mod)
+            radius_candidate.append(radius)
 
     # Clean memory
-    ra_candidate_all, dec_candidate_all, mod_candidate_all = [], [], []
+    ra_candidate_all, dec_candidate_all, mod_candidate_all, radius_candidate_all = [], [], [], []
 
     print('Ready to plot candidates!')
 
     # Zipping arguments to feed into command
-    plot_arguments = [*zip(ra_candidate,dec_candidate,mod_candidate)]
+    plot_arguments = [*zip(ra_candidate,dec_candidate,mod_candidate,radius_candidate)]
 
     with Pool(n_threads) as p:
         p.starmap(submit_plot_job, plot_arguments)
