@@ -96,26 +96,43 @@ class Region():
         self.proj = simple_adl.projector.Projector(self.ra, self.dec)
         self.pix_center = hp.ang2pix(self.nside, self.ra, self.dec, lonlat=True)
 
+### YOU ARE HERE
+
+
+
+    #def star_filter(self, data):
+   #     """Return stellar-like objects"""
+
+        #sel = (data['chi'] < 3) \
+        #    & (data['prob'] < 10) \
+        #    & (data['ndet'] > 9) \
+        #    & (np.abs(data['sharp']) < 0.8) \
+        #    & (data['gmag0'] < 23.5) \
+        #    & (data['rmag0'] < 23.5) \
+        #    & (np.abs(data['gmag0'] - data['rmag0']) < 1)
+        
+        #return sel
 
 
     def star_filter(self, data):
         """Return stellar-like objects"""
 
-        sel = (data['chi'] < 3) \
-            & (data['prob'] < 10) \
+        sel = (data['chi'] < 3.0) \
+            & (data['prob'] < 10.0) \
+            & (data['ndet'] > 9.0) \
             & (np.abs(data['sharp']) < 0.8) \
             & (data['gmag0'] < 23.5) \
             & (data['rmag0'] < 23.5) \
-            & (np.abs(data['gmag0'] - data['rmag0']) < 1)
+            & (np.abs(data['gmag0'] - data['rmag0'])  < 1)
         
         return sel
-
 
 
     def galaxy_filter(survey, data):
         """Return galaxy-like objects"""
 
         sel = (data['prob'] < 10) \
+            & (data['ndet'] > 9) \
             & (np.abs(data['sharp']) >= 0.8) \
             & (data['gmag0'] < 23.5) \
             & (data['rmag0'] < 23.5) \
@@ -126,9 +143,9 @@ class Region():
 
 
     #def load_data(self, stars=True, galaxies=False):
-       # SM: to query the equivalent of hp.get_all_neighbors() for nside=32,
-       #     choose a radius of 3 deg:
-       #>>> np.sqrt((1/np.pi)*8*hp.nside2pixarea(nside=32, degrees=True)) = 2.9238
+    #   # SM: to query the equivalent of hp.get_all_neighbors() for nside=32,
+    #   #     choose a radius of 3 deg:
+    #   #>>> np.sqrt((1/np.pi)*8*hp.nside2pixarea(nside=32, degrees=True)) = 2.9238
        
     #   data = simple_adl.query_dl.query(self.survey.catalog['profile'], self.ra, self.dec, radius=3.0, gmax=self.survey.catalog['mag_max'], stars=stars, galaxies=galaxies)
     #   self.data = data
@@ -165,7 +182,9 @@ class Region():
 
         pix_nside_select = hp.ang2pix(nside=self.nside, theta=self.ra, phi=self.dec, nest=False, lonlat=True)
 
-        pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(self.nside, pix_nside_select)])
+        pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(self.nside, pix_nside_select)]) # uncomment me when finished
+        #pix_nside_neighbors = [int(11749)]
+
 
         print('Center healpixel: {}'.format(pix_nside_select))
         print('Healpixels: {}'.format(pix_nside_neighbors))
@@ -185,7 +204,7 @@ class Region():
 
         if stars == True:
 
-            star_filter = (self.star_filter(data_raw) == 1)
+            star_filter = ((self.star_filter(data_raw)) == 1)
             
             data = data_raw[star_filter]
           
