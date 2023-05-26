@@ -55,14 +55,17 @@ if __name__ == '__main__':
     # Apply filters
 
     data = region.load_data(stars=True, galaxies=False) # Data is stars as default
+    #import pdb; pdb.set_trace()
+
     stars = data
 
     galaxies = region.load_data(stars=False, galaxies=True)
+    
 
-    print('Found {} objects'.format(len(region.data)))
-    if (len(region.data) == 0):
-        print('Ending search.')
-        exit()
+    print('Found objects')
+    #if (len(stars) == 0):
+    #    print('Ending search.')
+    #    exit()
 
 
 
@@ -79,6 +82,7 @@ if __name__ == '__main__':
 
     
     # Isochrone for stars
+
 
     iso_filter_stars = cut_isochrone_path(
         stars[survey.mag_dered_1], 

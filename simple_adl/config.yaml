@@ -5,13 +5,13 @@ batch:
 catalog:
   basis_1: ra
   basis_2: dec
-  data_dir: data_dir
   mag: '{}mag'
-  mag_dered: '{}mag0'
+  mag_dered: '{}mag_dered'
   mag_err: '{}err'
-  mag_max: 23.5
+  mag_max: 24.2
   nside: 32
   profile: delve_private
+  data_dir: data_dir
 isochrone:
   age: 12
   metallicity: 0.0001
@@ -22,6 +22,7 @@ output:
   log_dir: log_dir
   results_dir: results_dir
   save_dir: plot_dir
+  data_dir: data_dir
 survey:
   fracdet: null
   name: des

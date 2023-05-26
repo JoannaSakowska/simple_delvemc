@@ -25,7 +25,7 @@ config = {'survey': {
                        'basis_1'   : 'ra',
                        'basis_2'   : 'dec',
                        'mag'       : '{}mag',
-                       'mag_dered' : '{}mag0',
+                       'mag_dered' : '{}mag_dered',
                        'mag_err'   : '{}err',
                       },
           'isochrone': { # We may consider leaving this fixed for simplicity

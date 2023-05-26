@@ -13,12 +13,6 @@ from dl import queryClient as qc
 #-------------------------------------------------------------------------------
 
 # DES Redenning coefficients
-#R_g = 3.185
-#R_r = 2.140
-#R_i = 1.571
-
-# Yumi:
-# DES DR1 update
 
 #R_u = 3.9631
 R_g = 3.1863
@@ -27,11 +21,6 @@ R_i = 1.5690
 R_z = 1.196
 R_y = 1.048 
 
-# For SMASH:
-#R_u = 4.329
-#R_g = 3.303
-#R_r = 2.285
-#R_i = 1.263
 
 #--------------------------------------------------------------------------------
 
@@ -57,22 +46,28 @@ def query(profile, ra, dec, radius=1.0, gmax=24.2, stars=True, galaxies=True):
         SELECT ra,
                dec,
                gmag,
+               gmag-{R_g}*ebv AS gmag_dered,
                gerr,
                rmag,
+               rmag-{R_r}*ebv AS rmag_dered,
                rerr,
                ebv,
                ndetg,
-               ndetr
+               ndetr,
+               chi,
+               prob,
+               sharp,
+               brickuniq
         FROM delvemc_y4t1.object 
         WHERE q3c_radial_query(ra,dec,{ra},{dec},{radius})
               AND brickuniq = 1
-              AND gmag < 24.2
-              AND rmag < 24.2
+              AND gmag-{R_g}*ebv < 24.2
+              AND rmag-{R_r}*ebv < 24.2
               AND ndetg > 2
               AND ndetr > 2
-              AND abs(gmag - rmag) < 1 
-              AND prob < 10 
-              AND abs(sharp) < 0.8
+              AND abs(gmag-{R_g}*ebv - rmag-{R_r}*ebv) < 1 
+              AND prob >0.8
+              AND abs(sharp) < 0.5
               AND chi < 3
     '''
 
@@ -81,22 +76,29 @@ def query(profile, ra, dec, radius=1.0, gmax=24.2, stars=True, galaxies=True):
         SELECT ra,
                dec,
                gmag,
+               gmag-{R_g}*ebv AS gmag_dered,
                gerr,
                rmag,
+               rmag-{R_r}*ebv AS rmag_dered,
                rerr,
                ebv,
                ndetg,
-               ndetr
+               ndetr,
+               chi,
+               prob,
+               sharp,
+               brickuniq
         FROM delvemc_y4t1.object
         WHERE q3c_radial_query(ra,dec,{ra},{dec},{radius})
               AND brickuniq = 1
-              AND gmag < 24.2 
-              AND rmag < 24.2 
+              AND gmag-{R_g}*ebv < 24.2 
+              AND rmag-{R_r}*ebv < 24.2 
               AND ndetg > 2
               AND ndetr > 2
-              AND abs(gmag - rmag) < 1
-              AND prob < 10
-              AND abs(sharp) >= 0.8
+              AND abs(gmag-{R_g}*ebv - rmag-{R_r}*ebv) < 1
+              AND prob < 0.5
+              AND abs(sharp) >= 0.5
+              AND chi > 3
     '''
 
 

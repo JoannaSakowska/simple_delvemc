@@ -13,7 +13,7 @@ import scipy.stats
 import scipy.interpolate
 import scipy.ndimage
 
-import simple_adl.query_dl # Legacy
+import simple_adl.query_dl
 import simple_adl.projector
 
 import fitsio as fits
@@ -101,13 +101,13 @@ class Region():
         """Return stellar-like objects"""
 
         sel = (data['chi'] < 3.0) \
-            & (data['prob'] < 10.0) \
+            & (data['prob'] > 0.8) \
             & (data['ndetg'] > 2) \
             & (data['ndetr'] > 2) \
-            & (np.abs(data['sharp']) < 0.8) \
-            & (data['gmag0'] < 24.2) \
-            & (data['rmag0'] < 24.2) \
-            & (np.abs(data['gmag0'] - data['rmag0'])  < 1)
+            & (np.abs(data['sharp']) < 0.5) \
+            & (data['gmag_dered'] < 24.2) \
+            & (data['rmag_dered'] < 24.2) \
+            & (np.abs(data['gmag_dered'] - data['rmag_dered'])  < 1)
         
         return sel
 
@@ -115,13 +115,14 @@ class Region():
     def galaxy_filter(survey, data):
         """Return galaxy-like objects"""
 
-        sel = (data['prob'] < 10) \
-            & (np.abs(data['sharp']) >= 0.8) \
+        sel = (data['chi'] > 3.0) \
+            & (data['prob'] < 0.5) \
+            & (np.abs(data['sharp']) >= 0.5) \
             & (data['ndetg'] > 2) \
             & (data['ndetr'] > 2) \
-            & (data['gmag0'] < 24.2) \
-            & (data['rmag0'] < 24.2) \
-            & (np.abs(data['gmag0'] - data['rmag0']) < 1)
+            & (data['gmag_dered'] < 24.2) \
+            & (data['rmag_dered'] < 24.2) \
+            & (np.abs(data['gmag_dered'] - data['rmag_dered']) < 1)
         
         return sel
         
@@ -132,41 +133,45 @@ class Region():
     #   #     choose a radius of 3 deg:
     #   #>>> np.sqrt((1/np.pi)*8*hp.nside2pixarea(nside=32, degrees=True)) = 2.9238
        
-       data = simple_adl.query_dl.query(self.survey.catalog['profile'], self.ra, self.dec, radius=3.0, gmax=self.survey.catalog['mag_max'], stars=stars, galaxies=galaxies)
-       self.data = data
+        data = simple_adl.query_dl.query(self.survey.catalog['profile'], self.ra, self.dec, radius=3.0, gmax=self.survey.catalog['mag_max'], stars=stars, galaxies=galaxies)
+        #self.data = np.concatenate(data)
 
-       
-       # Catalogue search
-       #data_raw = np.concatenate(data_array) # JS: Extend data array, here we extend with neighbouring healpix data too?
 
-    ## Return stars:
+        if type(data) is list:
+            data_raw = np.concatenate(data)
 
-    #   if stars == True:
+        else:           
+            data_raw = data
 
-    #       star_filter = ((self.star_filter(data_raw)) == 1)
+        # Return stars:
+
+        if stars == True:
+
+            star_filter = ((self.star_filter(data_raw)) == 1)
             
-    #       data = data_raw[star_filter]
+            data = data_raw[star_filter]
             
-    ## Return galaxies:
+        # Return galaxies:
 
-    #   elif galaxies == True:
+        elif galaxies == True:
 
-    #       galaxy_filter = (self.galaxy_filter(data_raw) == 1)
+            galaxy_filter = (self.galaxy_filter(data_raw) == 1)
 
-    #       data = data_raw[galaxy_filter]
+            data = data_raw[galaxy_filter]
+
             
 
-    #   # Return both?
+        # Return both?
             
-    #   elif stars == True and galaxies == True:
+        elif stars == True and galaxies == True:
             
-    #       star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1)
+            star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1)
 
-    #       data = data_raw[star_galaxy_filter]
+            data = data_raw[star_galaxy_filter]
 
-    #   self.data = data
+        self.data = data
 
-       return self.data
+        return self.data
 
 
        
@@ -241,7 +246,7 @@ class Region():
          
         elif stars == True and galaxies == True:
             
-            star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1)
+            star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1) # should this be galaxy?
 
             data = data_raw[star_galaxy_filter]
 
