@@ -105,7 +105,7 @@ if __name__ == '__main__':
     extension = 0.05 # SM setting
     #extension = 0.025 #JS: Minimised the extension
 
-#    if args.radius is not None and args.radius < 0.1:
+#   if args.radius is not None and args.radius < 0.1:
     if args.radius is not None:
         r_estimate = args.radius
     else:

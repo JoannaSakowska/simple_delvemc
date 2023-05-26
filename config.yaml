@@ -8,7 +8,7 @@ catalog:
   mag: '{}mag'
   mag_dered: '{}mag0'
   mag_err: '{}err'
-  mag_max: 23.5
+  mag_max: 24.2
   nside: 32
   profile: delve_private
   data_dir: data_dir

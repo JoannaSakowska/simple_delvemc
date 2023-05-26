@@ -21,12 +21,12 @@ config = {'survey': {
                        'profile'   : 'delve_private',
                        'data_dir'  : 'data_dir',
                        'nside'     : 32,
-                       'mag_max'   : 23.5,
+                       'mag_max'   : 24.2,
                        'basis_1'   : 'ra',
                        'basis_2'   : 'dec',
                        'mag'       : '{}mag',
                        'mag_dered' : '{}mag0',
-                       'mag_err'   : '{}err'
+                       'mag_err'   : '{}err',
                       },
           'isochrone': { # We may consider leaving this fixed for simplicity
                         'name'        : 'Bressan2012',
