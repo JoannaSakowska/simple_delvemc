@@ -58,7 +58,7 @@ def query(profile, ra, dec, radius=1.0, gmax=24.2, stars=True, galaxies=True):
                prob,
                sharp,
                brickuniq
-        FROM delvemc_y4t1.object 
+        FROM delvemc_y4t2.object 
         WHERE q3c_radial_query(ra,dec,{ra},{dec},{radius})
               AND brickuniq = 1
               AND gmag-{R_g}*ebv < 24.2
@@ -88,7 +88,7 @@ def query(profile, ra, dec, radius=1.0, gmax=24.2, stars=True, galaxies=True):
                prob,
                sharp,
                brickuniq
-        FROM delvemc_y4t1.object
+        FROM delvemc_y4t2.object
         WHERE q3c_radial_query(ra,dec,{ra},{dec},{radius})
               AND brickuniq = 1
               AND gmag-{R_g}*ebv < 24.2 

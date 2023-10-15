@@ -62,7 +62,7 @@ if __name__ == '__main__':
     galaxies = region.load_data(stars=False, galaxies=True)
     
 
-    print('Found objects')
+    print('Found {} objects'.format(len(stars)))
     #if (len(stars) == 0):
     #    print('Ending search.')
     #    exit()

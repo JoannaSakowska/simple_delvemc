@@ -136,38 +136,39 @@ class Region():
         data = simple_adl.query_dl.query(self.survey.catalog['profile'], self.ra, self.dec, radius=3.0, gmax=self.survey.catalog['mag_max'], stars=stars, galaxies=galaxies)
         #self.data = np.concatenate(data)
 
+        # UNCOMMENT ME FOR CATALOGUE SEARCHING 
+        
+        #if type(data) is list:
+        #    data_raw = np.concatenate(data)
 
-        if type(data) is list:
-            data_raw = np.concatenate(data)
-
-        else:           
-            data_raw = data
+        #else:           
+        #    data_raw = data
 
         # Return stars:
 
-        if stars == True:
+        #if stars == True:
 
-            star_filter = ((self.star_filter(data_raw)) == 1)
+        #    star_filter = ((self.star_filter(data_raw)) == 1)
             
-            data = data_raw[star_filter]
+        #    data = data_raw[star_filter]
             
         # Return galaxies:
 
-        elif galaxies == True:
+        #elif galaxies == True:
 
-            galaxy_filter = (self.galaxy_filter(data_raw) == 1)
+        #    galaxy_filter = (self.galaxy_filter(data_raw) == 1)
 
-            data = data_raw[galaxy_filter]
+        #    data = data_raw[galaxy_filter]
 
             
 
         # Return both?
             
-        elif stars == True and galaxies == True:
+        #elif stars == True and galaxies == True:
             
-            star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1)
+        #    star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1)
 
-            data = data_raw[star_galaxy_filter]
+        #    data = data_raw[star_galaxy_filter]
 
         self.data = data
 
