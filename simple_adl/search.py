@@ -215,6 +215,7 @@ if __name__ == '__main__':
 
     #results = [np.empty((1,9)) for distance_modulus in distance_modulus_search_array]
 
+
     iso_search_array = [simple_adl.isochrone.Isochrone(survey=survey.isochrone['survey'],
                                                        band_1=survey.band_1.lower(),
                                                        band_2=survey.band_2.lower(),
