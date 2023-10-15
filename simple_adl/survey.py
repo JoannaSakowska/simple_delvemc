@@ -101,8 +101,8 @@ class Region():
         """Return stellar-like objects"""
 
         sel = (data['chi'] < 3) \
-            & (data['prob'] < 10) \
-            & (np.abs(data['sharp']) < 0.8) \
+            & (data['prob'] > 0.8) \
+            & (np.abs(data['sharp']) < 0.5) \
             & (data['gmag0'] < 23.5) \
             & (data['rmag0'] < 23.5) \
             & (np.abs(data['gmag0'] - data['rmag0']) < 1)
@@ -114,72 +114,50 @@ class Region():
     def galaxy_filter(survey, data):
         """Return galaxy-like objects"""
 
-        sel = (data['prob'] < 10) \
-            & (np.abs(data['sharp']) >= 0.8) \
+        sel = (data['chi'] > 3) \
+            & (data['prob'] < 0.5) \
+            & (np.abs(data['sharp']) >= 0.5) \
             & (data['gmag0'] < 23.5) \
             & (data['rmag0'] < 23.5) \
             & (np.abs(data['gmag0'] - data['rmag0']) < 1)
         
         return sel
         
+    # Another set to try:
 
+    #    def star_filter(self, data):
+    #    """Return stellar-like objects"""
 
-    #def load_data(self, stars=True, galaxies=False):
-       # SM: to query the equivalent of hp.get_all_neighbors() for nside=32,
-       #     choose a radius of 3 deg:
-       #>>> np.sqrt((1/np.pi)*8*hp.nside2pixarea(nside=32, degrees=True)) = 2.9238
-       
-        data = simple_adl.query_dl.query(self.survey.catalog['profile'], self.ra, self.dec, radius=3.0, gmax=self.survey.catalog['mag_max'], stars=stars, galaxies=galaxies)
-        #self.data = np.concatenate(data)
-
-        # UNCOMMENT ME FOR CATALOGUE SEARCHING 
+    #    sel = (data['chi'] < 3) \
+    #        & (data['prob'] < 10) \
+    #        & (np.abs(data['sharp']) < 0.8) \
+    #        & (data['gmag0'] < 23.5) \
+    #        & (data['rmag0'] < 23.5) \
+    #        & (np.abs(data['gmag0'] - data['rmag0']) < 1)
         
-        #if type(data) is list:
-        #    data_raw = np.concatenate(data)
-
-        #else:           
-        #    data_raw = data
-
-        # Return stars:
-
-        #if stars == True:
-
-        #    star_filter = ((self.star_filter(data_raw)) == 1)
-            
-        #    data = data_raw[star_filter]
-            
-        # Return galaxies:
-
-        #elif galaxies == True:
-
-        #    galaxy_filter = (self.galaxy_filter(data_raw) == 1)
-
-        #    data = data_raw[galaxy_filter]
-
-            
-
-        # Return both?
-            
-        #elif stars == True and galaxies == True:
-            
-        #    star_galaxy_filter = (self.star_filter(data_raw) == 1 or self.star_filter(data_raw) == 1)
-
-        #    data = data_raw[star_galaxy_filter]
-
-        self.data = data
-
-        return self.data
+    #    return sel
 
 
-       
+
+    #def galaxy_filter(survey, data):
+    #    """Return galaxy-like objects"""
+
+    #    sel = (data['prob'] < 10) \
+    #        & (np.abs(data['sharp']) >= 0.8) \
+    #        & (data['gmag0'] < 23.5) \
+    #        & (data['rmag0'] < 23.5) \
+    #        & (np.abs(data['gmag0'] - data['rmag0']) < 1)
+        
+    #    return sel
+    
+    ###################
+
     ## Below is simple ORIGINAL way of reading local catalogues:   
     #def construct_real_data(pix_nside_neighbors):
 
     #data_array = []
     #for pix_nside in pix_nside_neighbors:
         
-    ##    JS: To match catalogue name / e.g. catalogue is divided into healpix.fits etc
-    ##         for MC, the catalogue is in bricks. Could combine it into healpix?
 
     #    inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside)) 
     #    for infile in inlist:
@@ -192,8 +170,10 @@ class Region():
     #data = np.concatenate(data_array)
 
 
-    # FOR CAT SEARCHING
-    def load_data_local(self, stars=True, galaxies=False):
+    ##    JS: catalogue MUST BE divided into healpix.fits etc
+
+   
+    def load_data(self, stars=True, galaxies=False):
         """
         Load local catalogue data by healpix
         Apply star and galaxy filters

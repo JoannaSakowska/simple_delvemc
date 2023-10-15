@@ -6,7 +6,7 @@ catalog:
   basis_1: ra
   basis_2: dec
   mag: '{}mag'
-  mag_dered: '{}mag_dered'
+  mag_dered: '{}mag0'
   mag_err: '{}err'
   mag_max: 24.2
   nside: 32

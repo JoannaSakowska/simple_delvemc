@@ -36,7 +36,6 @@ if __name__ == "__main__":
     # Parse results from results_dir into a list of values
     results = []
     for file in glob.glob('{}/*.csv'.format(cfg['output']['results_dir'])): # BIG HERE FIX
-        print(file)
         with open(file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:

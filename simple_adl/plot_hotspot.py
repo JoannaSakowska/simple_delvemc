@@ -2,7 +2,7 @@
 """
 Generic python script.
 """
-__author__ = "Sid Mau and Joanna Sakowska"
+__author__ = "Sid Mau"
 
 # Python libraries
 import os
@@ -39,8 +39,6 @@ if __name__ == '__main__':
                         help='Declination of target position [deg]')
     parser.add_argument('--mod',type=float,required=False,
                         help='Distance modulus [mag]')
-    parser.add_argument('--radius',type=float,required=False,
-                        help='Radius estimate [deg]')
     args = parser.parse_args()
 
     with open(args.config, 'r') as ymlfile:
@@ -106,21 +104,27 @@ if __name__ == '__main__':
     color = stars[survey.mag_dered_1] - stars[survey.mag_dered_2]
     
     # Filters
-    extension = 0.05 # SM setting
-    #extension = 0.025 #JS: Minimised the extension
+    
+    # OLD ESTIMATE
 
-#   if args.radius is not None and args.radius < 0.1:
-    if args.radius is not None:
-        r_estimate = args.radius
-    else:
-        r_estimate = extension
+    #extension = 0.05 # SM setting
 
-    r0 = 3.0 * r_estimate # 3.0 # set as g-radius 
-    r1 = 5.0 * r_estimate # 5.0 
-    r2 = np.sqrt(r0**2 + r1**2) 
+    #if args.radius is not None:
+    #    r_estimate = args.radius
+    #else:
+    #    r_estimate = extension
 
+    #r0 = 3.0 * r_estimate # 3.0 # set as g-radius 
+    #r1 = 5.0 * r_estimate # 5.0 
+    #r2 = np.sqrt(r0**2 + r1**2) 
+
+    # NEW ESTIMATE
+    #  
+    extension = 0.025 #JS: Minimised the extension
+    r0 = 3.0 * extension # 3.0 # set as g-radius 
+    r1 = 5.0 * extension # 5.0 rnear? 
+    r2 = np.sqrt(r0**2 + r1**2) # rfar?
     angsep_stars = simple_adl.coordinate_tools.angsep(args.ra, args.dec, stars[survey.catalog['basis_1']], stars[survey.catalog['basis_2']])
-
     inner = (angsep_stars < r0)
     outer = ((angsep_stars > r1) & (angsep_stars < r2))
     background = (angsep_stars > r2)
@@ -142,7 +146,7 @@ if __name__ == '__main__':
     steps = 100
     bins = np.linspace(-bound, bound, steps)
     signal = np.histogram2d(x_stars[iso_filter_stars], y_stars[iso_filter_stars], bins=[bins, bins])[0]
-    sigma = 0.01 * (0.25 * np.arctan(0.25 * r0 * 60. - 1.5) + 1.3) # r0 = 3.0 * 0.05 is the ORIGINAL r0
+    sigma = 0.01 * (0.25 * np.arctan(0.25 * r0 * 60. - 1.5) + 1.3)
     convolution = scipy.ndimage.filters.gaussian_filter(signal, sigma/(bound/steps)).T
     pc = ax.pcolormesh(bins, bins, convolution, cmap='Greys', rasterized=True)
     
@@ -343,20 +347,20 @@ if __name__ == '__main__':
 
     # Checking to see how not isochrone filtered stars are distributed:
     # This is *not* the original setting
-    #x_stars_no_iso, y_stars_no_iso = proj.sphereToImage(stars[survey.catalog['basis_1']], stars[survey.catalog['basis_2']])
-    #ax.scatter(x_stars_no_iso, y_stars_no_iso, edgecolor='none', s=3, c='black')
+    x_stars_no_iso, y_stars_no_iso = proj.sphereToImage(stars[survey.catalog['basis_1']], stars[survey.catalog['basis_2']])
+    ax.scatter(x_stars_no_iso, y_stars_no_iso, edgecolor='none', s=3, c='black')
 
     # Below plots stars that are isochrone filtered *already*
     # This is the original plot setting
     x_stars, y_stars = proj.sphereToImage(stars[iso_filter_stars][survey.catalog['basis_1']], stars[iso_filter_stars][survey.catalog['basis_2']])
 
     #ax.scatter(x_stars, y_stars, edgecolor='none', s=3, c='black')
-    ax.scatter(x_stars, y_stars, edgecolor='none', s=7, c='r', label='$\Delta$CM < 0.1')
+    ax.scatter(x_stars, y_stars, edgecolor='none', s=5, c='green', label='r < {:.3f}$^\circ$'.format(r0))
 
     # Overplot isochrone filtered stars in nbhd
     x_stars_nbhd, y_stars_nbhd = proj.sphereToImage(stars[iso_filter_stars & nbhd_stars][survey.catalog['basis_1']], stars[iso_filter_stars & nbhd_stars][survey.catalog['basis_2']])
-    ax.scatter(x_stars_nbhd, y_stars_nbhd, edgecolor='none', s=5, c='green', label='r < {:.3f}$^\circ$'.format(r0))
-    
+    ax.scatter(x_stars_nbhd, y_stars_nbhd, edgecolor='none', s=7, c='r', label='$\Delta$CM < 0.1')
+
     ax.set_xlim(0.25, -0.25)
     ax.set_ylim(-0.25, 0.25)
     ax.set_xlabel(r'$\Delta$ RA (deg)')
