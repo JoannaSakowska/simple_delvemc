@@ -82,6 +82,7 @@ class Survey():
 
 #-------------------------------------------------------------------------------
 
+
 class Region():
     """
     Class to handle regions.
@@ -103,8 +104,8 @@ class Region():
         sel = (data['chi'] < 3) \
             & (data['prob'] > 0.8) \
             & (np.abs(data['sharp']) < 0.5) \
-            & (data['gmag0'] < 23.5) \
-            & (data['rmag0'] < 23.5) \
+            & (data['gmag0'] < 24.2) \
+            & (data['rmag0'] < 24.2) \
             & (np.abs(data['gmag0'] - data['rmag0']) < 1)
         
         return sel
@@ -117,8 +118,8 @@ class Region():
         sel = (data['chi'] > 3) \
             & (data['prob'] < 0.5) \
             & (np.abs(data['sharp']) >= 0.5) \
-            & (data['gmag0'] < 23.5) \
-            & (data['rmag0'] < 23.5) \
+            & (data['gmag0'] < 24.2) \
+            & (data['rmag0'] < 24.2) \
             & (np.abs(data['gmag0'] - data['rmag0']) < 1)
         
         return sel
@@ -180,7 +181,10 @@ class Region():
         """
     
         data_array = [] 
-        data_dir = "/home/js01093/dwarf/simple_adl/simple_adl/data_dir/delvemc_blue" # Temp for now
+        #data_dir = "/home/js01093/dwarf/simple_adl/simple_adl/data_dir/delvemc_blue" # Temp for now
+        data_dir = "/home/js01093/dwarf/simple_adl/simple_adl/data_dir/y4t2" 
+
+
 
         pix_nside_select = hp.ang2pix(nside=self.nside, theta=self.ra, phi=self.dec, nest=False, lonlat=True)
 
