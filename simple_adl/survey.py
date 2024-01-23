@@ -181,8 +181,7 @@ class Region():
         """
     
         data_array = [] 
-        #data_dir = "/home/js01093/dwarf/simple_adl/simple_adl/data_dir/delvemc_blue" # Temp for now
-        data_dir = "/home/js01093/dwarf/simple_adl/simple_adl/data_dir/y4t2" 
+        data_dir = "/vol/ph/astro_data/jsakowska/DELVE/delvemc_y4t2" 
 
 
 
